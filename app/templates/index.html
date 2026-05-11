@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block head_extra %}
+<link rel="stylesheet" href="/static/styles/home.css" />
+{% endblock %}
+{% block body %}
+<div class="page">
+  <header class="header">
+    <div class="headerInner">
+      <div class="logo">
+        <div class="logoMark">SF</div>
+        <div>
+          <div class="siteTitle">SF Pulse</div>
+          <div class="siteSubtitle">New restaurants in San Francisco</div>
+        </div>
+      </div>
+      <div class="headerActions">
+        <a class="iconBtn" href="/map" aria-label="Neighborhood map">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+        </a>
+        <button class="iconBtn" type="button" data-push-button hidden aria-label="Push notifications">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9z"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="tabsRow">
+      <nav class="tabs" aria-label="Content sections">
+        <a class="tab tabRestaurants" href="#restaurants" data-tab="restaurants">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+            <path d="M7 2v20"></path>
+            <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"></path>
+          </svg>
+          Restaurants ({{ restaurants|length }})
+        </a>
+        <a class="tab tabDiagram" href="#diagram" data-tab="diagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="6" r="3"></circle>
+            <circle cx="18" cy="6" r="3"></circle>
+            <circle cx="12" cy="18" r="3"></circle>
+            <line x1="6" y1="9" x2="12" y2="15"></line>
+            <line x1="18" y1="9" x2="12" y2="15"></line>
+          </svg>
+          Diagram
+        </a>
+      </nav>
+      {% if last_updated %}
+      <span class="tabsClock">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Last updated:
+        <span data-last-updated>{{ last_updated }}</span>
+      </span>
+      {% endif %}
+    </div>
+
+    <div class="panels">
+      <section id="restaurants" class="panel">
+        <table class="dataTable">
+          <thead>
+            <tr><th>Name</th><th>Neighborhood</th><th>Cuisine</th><th>Opened</th></tr>
+          </thead>
+          <tbody data-table="restaurants">
+            {% for r in restaurants %}
+            <tr data-row-id="{{ r.id }}">
+              <td>
+                <div class="cellPrimary"><a class="detailLink" href="/restaurants/{{ r.id }}">{{ r.name }}</a></div>
+                {% if r.address %}<div class="cellSub cellAddress">{{ r.address }}</div>{% endif %}
+                {% if r.source_url %}<a href="{{ r.source_url }}" target="_blank" rel="noopener noreferrer" class="cellSource">Source</a>{% endif %}
+              </td>
+              <td><span class="badge">{{ r.neighborhood }}</span></td>
+              <td class="tableMuted">{{ r.cuisine }}</td>
+              <td class="tableMuted tableDate">{{ r.opened_date }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="emptyCell">No restaurants yet — check back after the next refresh.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <section id="diagram" class="panel diagramSection" hidden>
+        <div class="diagramFrameWrap">
+          <iframe class="diagramFrame" src="/diagram/" title="Daily refresh workflow diagram" loading="lazy"></iframe>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script id="initial-data" type="application/json">{{ initial_data_json|safe }}</script>
+<script src="/static/home.js" defer></script>
+{% endblock %}
