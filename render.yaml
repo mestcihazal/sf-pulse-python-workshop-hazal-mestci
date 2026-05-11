@@ -27,7 +27,7 @@ projects:
             startCommand: uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT
             healthCheckPath: /api/healthz
             envVars:
-              - fromGroup: sf-pulse-python-env
+              - fromGroup: sf-pulse-env
               - key: DATABASE_URL
                 fromDatabase:
                   name: sf-pulse-python-db
