@@ -1,5 +1,5 @@
 projects:
-  - name: sf-pulse-python
+  - name: sf-pulse-python-hazal-mestci
     environments:
       - name: production
         databases:
