@@ -61,23 +61,25 @@ async def pool(postgres_container: "PostgresContainer") -> AsyncIterator[asyncpg
         await p.close()
 
 
+_TRUNCATE_SQL = """
+    TRUNCATE TABLE
+        push_subscriptions,
+        data_updates,
+        cron_runs,
+        events,
+        restaurants
+    RESTART IDENTITY CASCADE
+"""
+
+
 @pytest_asyncio.fixture
 async def clean_db(pool: asyncpg.Pool) -> AsyncIterator[asyncpg.Pool]:
-    """Truncate data tables between tests; keep schema_migrations intact."""
-    yield pool
-    # Run after the test so the next test starts clean.
+    """Truncate data tables before and after each test; keep schema_migrations intact."""
     async with pool.acquire() as conn:
-        await conn.execute(
-            """
-            TRUNCATE TABLE
-                push_subscriptions,
-                data_updates,
-                cron_runs,
-                events,
-                restaurants
-            RESTART IDENTITY CASCADE
-            """
-        )
+        await conn.execute(_TRUNCATE_SQL)
+    yield pool
+    async with pool.acquire() as conn:
+        await conn.execute(_TRUNCATE_SQL)
 
 
 @pytest_asyncio.fixture

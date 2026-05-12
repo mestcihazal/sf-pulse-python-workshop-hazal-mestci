@@ -7,6 +7,11 @@
   // ── Tab switching (panels are sections; nav has data-tab) ────────────────────
   const tabs = document.querySelectorAll('[data-tab]')
   const panels = document.querySelectorAll('.panel')
+  const pageEl = document.querySelector('.page')
+
+  function syncTabClass(name) {
+    if (pageEl) pageEl.classList.toggle('eventsActive', name === 'events')
+  }
 
   function showPanel(name) {
     for (const p of panels) {
@@ -17,11 +22,12 @@
     for (const t of tabs) {
       t.classList.toggle('tabActive', t.dataset.tab === name)
     }
+    syncTabClass(name)
   }
 
   function activatePanelFromHash() {
     const hash = (window.location.hash || '#restaurants').replace('#', '')
-    showPanel(['restaurants', 'diagram'].includes(hash) ? hash : 'restaurants')
+    showPanel(['restaurants', 'events', 'diagram'].includes(hash) ? hash : 'restaurants')
   }
 
   for (const t of tabs) {
@@ -52,6 +58,7 @@
     if (typeof EventSource === 'undefined') return
     source = new EventSource('/api/events-stream')
     source.addEventListener('restaurants', (ev) => onCollectionUpdate('restaurants', ev))
+    source.addEventListener('events', (ev) => onCollectionUpdate('events', ev))
     source.addEventListener('error', () => {
       // Browser auto-reconnects; nothing to do.
     })
